@@ -14,7 +14,7 @@ def writeToFile(soup,fName=None,Dir=os.path.expanduser("~")+"/Documents/Sites"):
 		os.makedirs(Dir)
 	if fName is None:
 		fName=input("Enter filename: ")
-	with open(Dir+"/"+fName+".txt",'a') as f:
+	with open(Dir+"/"+fName+".html",'a') as f:
 		f.write(soup.prettify())
 
 if __name__=="__main__":
