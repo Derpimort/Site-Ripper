@@ -17,32 +17,36 @@ def writeToFile(content,Dir,fName=None):
 	with open(os.path.join(Dir,fName),'a') as f:
 		f.write(content)
 
-def ripIt(html_pag,sub_dir,fName):
+def ripIt(html_page,sub_dir):
 	soup=BeautifulSoup(html_page,"lxml")
 	#print(str(soup))
-	writeToFile(soup.prettify(),sub_dir,fName)
+	writeToFile(soup.prettify(),sub_dir,"index.html")
 	css=soup.find_all("link")
 	js=soup.find_all("script")
 	for tag in css:
-	    try:
-	        res_link=tag['href']
-	        if(not res_link.startswith("http")):
-	            res_fname=res_link.split("/")[-1]
-	            res_dir=res_link.split("/")[:-1]
-	            res=requests.get(os.path.join(link,res_link)).content
-	            writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
-	    except:
-	        continue
-	for tag in js:
-	    try:
-	        res_link=tag['src']
-	        if(not tag['src'].startswith("http")):
-	            res_fname=res_link.split("/")[-1]
-	            res_dir=res_link.split("/")[:-1]
-	            res=requests.get(os.path.join(link,res_link)).content
-	            writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
-	    except:
-	        continue
+		print(tag)
+		try:
+			res_link=tag['href']
+			if(not res_link.startswith("http")):
+				res_fname=res_link.split("/")[-1]
+				res_dir=res_link[:-len(res_fname)]
+				res=requests.get(os.path.join(link,res_link)).content
+				print(res_link, res_fname, res_dir)
+				writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
+		except:
+			continue
+		for tag in js:
+			print(tag)
+			try:
+				res_link=tag['src']
+				if(not res_link.startswith("http")):
+					res_fname=res_link.split("/")[-1]
+					res_dir=res_link[:-len(res_fname)]
+					res=requests.get(os.path.join(link,res_link)).content
+					print(res_link, res_fname, res_dir)
+					writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
+			except:
+				continue
 if __name__=="__main__":
 	links=[]
 	try:
@@ -64,7 +68,7 @@ if __name__=="__main__":
 			continue
 		sub_dir=os.path.join(parent_dir,link.split("/")[2].replace(".","-"))
 		html_page=web_page.content
-		ripIt(html_page,sub_dir,link.split("/")[-1])
+		ripIt(html_page,sub_dir)
 		print("Link:",link,"success")
 
 
