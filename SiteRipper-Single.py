@@ -17,33 +17,29 @@ def writeToFile(content,Dir,fName=None):
 	with open(os.path.join(Dir,fName),'a') as f:
 		f.write(content)
 
-def ripIt(html_page,sub_dir):
+def ripIt(html_page,sub_dir,link):
 	soup=BeautifulSoup(html_page,"lxml")
 	#print(str(soup))
 	writeToFile(soup.prettify(),sub_dir,"index.html")
 	css=soup.find_all("link")
 	js=soup.find_all("script")
 	for tag in css:
-		print(tag)
 		try:
 			res_link=tag['href']
 			if(not res_link.startswith("http")):
 				res_fname=res_link.split("/")[-1]
 				res_dir=res_link[:-len(res_fname)]
-				res=requests.get(os.path.join(link,res_link)).content
-				print(res_link, res_fname, res_dir)
+				res=requests.get(os.path.join(link,res_link)).text
 				writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
 		except:
 			continue
 		for tag in js:
-			print(tag)
 			try:
 				res_link=tag['src']
 				if(not res_link.startswith("http")):
 					res_fname=res_link.split("/")[-1]
 					res_dir=res_link[:-len(res_fname)]
-					res=requests.get(os.path.join(link,res_link)).content
-					print(res_link, res_fname, res_dir)
+					res=requests.get(os.path.join(link,res_link)).text
 					writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
 			except:
 				continue
@@ -68,7 +64,7 @@ if __name__=="__main__":
 			continue
 		sub_dir=os.path.join(parent_dir,link.split("/")[2].replace(".","-"))
 		html_page=web_page.content
-		ripIt(html_page,sub_dir)
+		ripIt(html_page,sub_dir,link)
 		print("Link:",link,"success")
 
 
