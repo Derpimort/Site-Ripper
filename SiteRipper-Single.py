@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import sys
+from urllib.parse import urlparse, urljoin
 
 def writeToFile(content,Dir,fName=None):
 	if not os.path.exists(Dir):
@@ -17,32 +18,28 @@ def writeToFile(content,Dir,fName=None):
 	with open(os.path.join(Dir,fName),'a') as f:
 		f.write(content)
 
+def getResource(soup, parentTag, attr, sub_dir, link):
+	parent=soup.find_all(parentTag)
+	for tag in parent:
+		try:
+			res_link=urlparse(tag[attr])
+			if(not res_link[0].startswith("http")):
+				res_fname=res_link[2].split("/")[-1]
+				res_dir=res_link[2][:-len(res_fname)]
+				res=requests.get(urljoin(link,res_link[2])).text
+				writeToFile(res,os.path.normpath(sub_dir+res_dir),res_fname)
+		except Exception as e:
+			print(e)
+			continue
+	
 def ripIt(html_page,sub_dir,link):
 	soup=BeautifulSoup(html_page,"lxml")
 	#print(str(soup))
 	writeToFile(soup.prettify(),sub_dir,"index.html")
-	css=soup.find_all("link")
-	js=soup.find_all("script")
-	for tag in css:
-		try:
-			res_link=tag['href']
-			if(not res_link.startswith("http")):
-				res_fname=res_link.split("/")[-1]
-				res_dir=res_link[:-len(res_fname)]
-				res=requests.get(os.path.join(link,res_link)).text
-				writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
-		except:
-			continue
-		for tag in js:
-			try:
-				res_link=tag['src']
-				if(not res_link.startswith("http")):
-					res_fname=res_link.split("/")[-1]
-					res_dir=res_link[:-len(res_fname)]
-					res=requests.get(os.path.join(link,res_link)).text
-					writeToFile(res,os.path.join(sub_dir,res_dir),res_fname)
-			except:
-				continue
+	getResource(soup, "link", "href", sub_dir, link)
+	getResource(soup, "script", "src", sub_dir, link)
+	getResource(soup, "img", "src", sub_dir, link)
+	
 if __name__=="__main__":
 	links=[]
 	try:
@@ -62,7 +59,9 @@ if __name__=="__main__":
 			web_page=requests.get(link)
 		except:
 			continue
-		sub_dir=os.path.join(parent_dir,link.split("/")[2].replace(".","-"))
+		urlDat=urlparse(link)
+		urlLoc=urlDat[2][:-len(urlDat[2].split("/")[-1])]
+		sub_dir=os.path.join(parent_dir,os.path.join(urlDat[1].replace(".","-"),urlLoc))
 		html_page=web_page.content
 		ripIt(html_page,sub_dir,link)
 		print("Link:",link,"success")
