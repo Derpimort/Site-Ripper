@@ -22,10 +22,12 @@ def getResource(soup, parentTag, attr, sub_dir, link):
 	parent=soup.find_all(parentTag)
 	for tag in parent:
 		try:
+			#print(tag)
 			res_link=urlparse(tag[attr])
-			if(not res_link[0].startswith("http")):
+			if(not (res_link[0].startswith("http") or res_link[2]=="")):
 				res_fname=res_link[2].split("/")[-1]
 				res_dir=res_link[2][:-len(res_fname)]
+				#print(res_link)
 				res=requests.get(urljoin(link,res_link[2])).text
 				writeToFile(res,os.path.normpath(sub_dir+res_dir),res_fname)
 		except Exception as e:
@@ -49,11 +51,12 @@ if __name__=="__main__":
 			links+=[input("Enter Link, enter empty to end: ")]
 			if links[-1]=="":
 				break
-	parent_dir=input("Enter parent directory(~/Documents/Sites/): ")
+	#parent_dir=input("Enter parent directory(~/Documents/Sites/): ")
 	   
+	
+	parent_dir=os.path.expanduser("~")+"/Documents/Sites"
 	if(not os.path.isdir(parent_dir)):	
-		parent_dir=os.path.expanduser("~")+"/Documents/Sites"
-
+		os.mkdir(parent_dir)
 	for link in links:
 		try:
 			web_page=requests.get(link)
@@ -61,9 +64,11 @@ if __name__=="__main__":
 			continue
 		urlDat=urlparse(link)
 		urlLoc=urlDat[2][:-len(urlDat[2].split("/")[-1])]
-		sub_dir=os.path.join(parent_dir,os.path.join(urlDat[1].replace(".","-"),urlLoc))
+		#print(urlDat)
+		sub_dir=os.path.join(parent_dir,os.path.normpath(urlDat[1].replace(".","-")+urlLoc))
+		#print(parent_dir, sub_dir)
 		html_page=web_page.content
 		ripIt(html_page,sub_dir,link)
-		print("Link:",link,"success")
+		print("\nSucess:",link,"\nCheck in ~/Documents/Sites/")
 
 
