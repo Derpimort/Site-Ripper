@@ -2,7 +2,7 @@
 Simple site skeleton ripper implemented with beautiful soup 4.  
 
 ### Python Dependencies
-##### requests, BS4, os ,sys, urllib
+##### requests, BS4, os, sys, urllib
 ```
 pip install requests
 pip install beautifulsoup4
