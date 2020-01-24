@@ -15,8 +15,12 @@ def writeToFile(content,Dir,fName=None):
 		os.makedirs(Dir)
 	if fName is None:
 		fName=input("Enter filename: ")
-	with open(os.path.join(Dir,fName),'a') as f:
-		f.write(content)
+	try:
+		Tfile=open(os.path.join(Dir,fName),'r')
+		Tfile.close()
+	except FileNotFoundError:
+		with open(os.path.join(Dir,fName),'w') as f:
+			f.write(content)
 
 def getResource(soup, parentTag, attr, sub_dir, link):
 	parent=soup.find_all(parentTag)
@@ -31,13 +35,17 @@ def getResource(soup, parentTag, attr, sub_dir, link):
 				res=requests.get(urljoin(link,res_link[2])).text
 				writeToFile(res,os.path.normpath(sub_dir+res_dir),res_fname)
 		except Exception as e:
-			print(e)
+			#print(e)
 			continue
 	
 def ripIt(html_page,sub_dir,link):
 	soup=BeautifulSoup(html_page,"lxml")
 	#print(str(soup))
-	writeToFile(soup.prettify(),sub_dir,"index.html")
+	fName=link.split("/")[-1]
+	if(not (fName.endswith(".html") and fName.endswith(".php")) ):
+		writeToFile(soup.prettify(),sub_dir+"/"+fName,"index.html")
+	else:
+		writeToFile(soup.prettify(),sub_dir,fName)
 	getResource(soup, "link", "href", sub_dir, link)
 	getResource(soup, "script", "src", sub_dir, link)
 	getResource(soup, "img", "src", sub_dir, link)
