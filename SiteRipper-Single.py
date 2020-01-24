@@ -43,9 +43,9 @@ def ripIt(html_page,sub_dir,link):
 	#print(str(soup))
 	fName=link.split("/")[-1]
 	if(not (fName.endswith(".html") and fName.endswith(".php")) ):
-		writeToFile(soup.prettify(),sub_dir+"/"+fName,"index.html")
-	else:
-		writeToFile(soup.prettify(),sub_dir,fName)
+		sub_dir+="/"+fName+"/"
+		fName="index.html"
+	writeToFile(soup.prettify(),sub_dir,fName)
 	getResource(soup, "link", "href", sub_dir, link)
 	getResource(soup, "script", "src", sub_dir, link)
 	getResource(soup, "img", "src", sub_dir, link)
