@@ -32,7 +32,10 @@ def getResource(soup, parentTag, attr, sub_dir, link):
 				res_fname=res_link[2].split("/")[-1]
 				res_dir=res_link[2][:-len(res_fname)]
 				#print(res_link)
+				#print(res_link)
+				print(link, urljoin(link,res_link[2]), res_link[2])
 				res=requests.get(urljoin(link,res_link[2])).text
+				#print(res)
 				writeToFile(res,os.path.normpath(sub_dir+res_dir),res_fname)
 		except Exception as e:
 			#print(e)
@@ -41,10 +44,15 @@ def getResource(soup, parentTag, attr, sub_dir, link):
 def ripIt(html_page,sub_dir,link):
 	soup=BeautifulSoup(html_page,"lxml")
 	#print(str(soup))
-	fName=link.split("/")[-1]
-	if(not (fName.endswith(".html") and fName.endswith(".php")) ):
-		sub_dir+="/"+fName+"/"
+	if(not (link.endswith(".html") and link.endswith(".php"))):
+		if not link.endswith("/"):
+			link+="/"
+		sub_dir+="/"+link.split("/")[-2]+"/"
 		fName="index.html"
+	else:
+		fName=link.split("/")[-1]
+		
+		
 	writeToFile(soup.prettify(),sub_dir,fName)
 	getResource(soup, "link", "href", sub_dir, link)
 	getResource(soup, "script", "src", sub_dir, link)
