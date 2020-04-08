@@ -85,6 +85,6 @@ if __name__=="__main__":
 		#print(parent_dir, sub_dir)
 		html_page=web_page.content
 		ripIt(html_page,sub_dir,link)
-		print("\nSucess:",link,"\nCheck in ~/Documents/Sites/")
+		print("\nSuccess:",link,"\nCheck in ~/Documents/Sites/")
 
 
