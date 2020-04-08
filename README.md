@@ -9,10 +9,10 @@ pip install beautifulsoup4
 ```
 
 ### What works?
-- [x] Get given webpage html
-- [x] Get JS and CSS resources... Naive mode
-- [x] Get img resources
-- [x] Imitate website dir structure
-- [ ] Custom Parent directory
-- [ ] Get dynamically loaded resources.... Expert mode
+- [x] Get webpage html.
+- [x] Get JS and CSS resources... Naive mode.
+- [x] Get img resources.
+- [x] Imitate website dir structure.
+- [ ] Custom Parent directory.
+- [ ] Get dynamically loaded resources.... Expert mode.
 - [ ] GUI?
